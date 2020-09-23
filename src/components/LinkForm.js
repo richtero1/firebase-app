@@ -34,7 +34,7 @@ const LinkForm = (props) => {
         }else{
             getLinkById(props.currentId);
         }
-    }, [props.currentId]);
+    }, [props.currentId]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <form className= "card - card-body" onSubmit= {handleSubmit}>
