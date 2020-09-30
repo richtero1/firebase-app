@@ -7,55 +7,68 @@ const Links = () => {
 
     let t1;
     let t2;
-    const[t, setT] = useState(0);
+    const [t, setT] = useState(0);
 
-    const [links, setLinks] = useState([]);
+    const [employees, setLinks] = useState([]);
     const [currentId, setCurrentId] = useState('');
+
 
     const addOrEditLink = async (linkObject) => {
         try {
             if (currentId === '') {
-                await db.collection('links').doc().set(linkObject);
+                t1 = performance.now();
+                await db.collection('employees').doc().set(linkObject);
                 console.log('new task added');
+                t2 = performance.now();
             } else {
-                db.collection('links').doc(currentId).update(linkObject);
+                db.collection('employees').doc(currentId).update(linkObject);
                 setCurrentId('');
             }
         } catch (error) {
             console.error(error);
         }
 
-
+        setT(t2 - t1);
+        console.log(t2 - t1);
     }
 
     const onDeleteLink = async (id) => {
-        await db.collection('links').doc(id).delete();
-        console.log('task deleted')
+        t1= performance.now();
+        await db.collection('employees').doc(id).delete();
+        t2 = performance.now();
+        setT(t2 - t1);
     }
 
     const getLinks = async () => {
 
         t1 = performance.now();
         //querySnapshot es la respuesta de firebase
-        db.collection('links').onSnapshot((querySnapshot) => {
+        db.collection('employees').onSnapshot((querySnapshot) => {
             const docs = [];
             querySnapshot.forEach(doc => {
                 docs.push({ ...doc.data(), id: doc.id });
             });
             setLinks(docs);
         });
-
         t2 = performance.now();
-        t1 = t1.toFixed(3);
-        console.log(t1);
+        setT(t2 - t1);
+        console.log(t2 - t1);
+    };
 
-        t2 = t2.toFixed(3);
-        console.log(t2);
+    const query = async () => {
 
-        setT(t2-t1);
-        
-        console.log(t2-t1);
-        
+        t1 = performance.now();
+        //querySnapshot es la respuesta de firebase
+        db.collection('employees').where('city', '==', 'Pensacola').onSnapshot((querySnapshot) => {
+            const docs = [];
+            querySnapshot.forEach(doc => {
+                docs.push({ ...doc.data(), id: doc.id });
+            });
+            setLinks(docs);
+        });
+        t2 = performance.now();
+        setT(t2 - t1);
+        console.log(t2 - t1);
     };
 
     useEffect(() => {
@@ -81,38 +94,63 @@ const Links = () => {
                 </nav>
             </div>
             <div className="container p-3">
-                <LinkForm {...{ addOrEditLink, currentId, links }} />
+                <LinkForm {...{ addOrEditLink, currentId, employees }} />
             </div>
-
             <div className="container">
-                <h1>tiempo de respuesta de lectura: {t.toFixed(3)} ms.</h1>
-                <br/>
-                <table className="table table-striped">
+                <div className="row" >
+                    <div className="col-3"></div>
+                    <div className="col-3 ">
+                        <button type="button" className="btn btn-success " onClick={getLinks}> Obtener Todo</button>
+                    </div>
+                    <div className="col-1"></div>
+                    <div className="col-3 text center">
+                        <button type="button" className="btn btn-success " onClick={query}> Ejecutar prueba</button>
+                    </div>
+                    <div className="col-2"></div>
+                </div>
+
+
+            </div>
+            <div className="container">
+                <h1>tiempo de respuesta de tarea: {t.toFixed(3)} ms.</h1>
+                <br />
+                <table className="table table-striped table-responsive">
                     <thead >
                         <tr>
-                            <th scope="col">Website Name</th>
-                            <th>Url</th>
-                            <th>Description</th>
+                            <th scope="col">First Name</th>
+                            <th>Last Name</th>
+                            <th>Email</th>
+                            <th>Birthdate</th>
+                            <th>Gender</th>
+                            <th>SSN</th>
+                            <th>Num. Telefono</th>
+                            <th>Dept.</th>
+                            <th>Ciudad</th>
+                            <th>Estado</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {links.map(link => (
+                        {employees.map(link => (
                             <tr key={link.id}>
-                                <td>{link.name}</td>
-                                <td>{link.url}</td>
-                                <td>{link.description}</td>
+                                <td>{link.first_name}</td>
+                                <td>{link.last_name}</td>
+                                <td>{link.email}</td>
+                                <td>{link.birthdate}</td>
+                                <td>{link.gender}</td>
+                                <td>{link.ssn}</td>
+                                <td>{link.phone_number}</td>
+                                <td>{link.department}</td>
+                                <td>{link.city}</td>
+                                <td>{link.state}</td>
                                 <td>
                                     <i className="material-icons text-danger p-2" onClick={() => onDeleteLink(link.id)}>close</i>
                                     <i className="material-icons p-2" onClick={() => setCurrentId(link.id)}>create</i>
                                 </td>
-
                             </tr>
                         ))}
                     </tbody>
                 </table>
             </div>
-            
-
         </div>
     )
 };
