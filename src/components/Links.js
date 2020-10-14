@@ -1,48 +1,48 @@
 import React, { useEffect, useState } from 'react'
+
 import LinkForm from './LinkForm'
 
 import { db } from '../firebase'
 
 const Links = () => {
-
-    let t1;
-    let t2;
+    
     const [t, setT] = useState(0);
 
     const [employees, setLinks] = useState([]);
     const [currentId, setCurrentId] = useState('');
 
 
-    const addOrEditLink = async (linkObject) => {
+    const addOrEditLink = (linkObject) => {
+        let t1, t2 = 0;
         try {
             if (currentId === '') {
                 t1 = performance.now();
-                await db.collection('employees').doc().set(linkObject);
-                console.log('new task added');
+                db.collection('employees').doc().set(linkObject);
                 t2 = performance.now();
             } else {
+                t1 = performance.now();
                 db.collection('employees').doc(currentId).update(linkObject);
+                t2 = performance.now();
                 setCurrentId('');
             }
         } catch (error) {
             console.error(error);
         }
-
         setT(t2 - t1);
         console.log(t2 - t1);
+
     }
 
-    const onDeleteLink = async (id) => {
+    const onDeleteLink = (id) => {
+        let t1,t2 = 0;
         t1= performance.now();
-        await db.collection('employees').doc(id).delete();
+        db.collection('employees').doc(id).delete();
         t2 = performance.now();
         setT(t2 - t1);
     }
 
-    const getLinks = async () => {
-
-        t1 = performance.now();
-        //querySnapshot es la respuesta de firebase
+    const getLinks = () => {
+        
         db.collection('employees').onSnapshot((querySnapshot) => {
             const docs = [];
             querySnapshot.forEach(doc => {
@@ -50,29 +50,26 @@ const Links = () => {
             });
             setLinks(docs);
         });
-        t2 = performance.now();
-        setT(t2 - t1);
-        console.log(t2 - t1);
+        
     };
 
-    const query = async () => {
-
+    const query = () => {
+        let t1,t2 = 0;
         t1 = performance.now();
-        //querySnapshot es la respuesta de firebase
-        db.collection('employees').where('city', '==', 'Pensacola').onSnapshot((querySnapshot) => {
+        db.collection('employees').where('city', '==', 'Miami').where('department', '==', 'Engineering').onSnapshot((querySnapshot) => {
             const docs = [];
             querySnapshot.forEach(doc => {
                 docs.push({ ...doc.data(), id: doc.id });
             });
-            setLinks(docs);
+            setLinks(docs); 
         });
-        t2 = performance.now();
-        setT(t2 - t1);
+        t2 = performance.now(); 
+        setT(t2 - t1); 
         console.log(t2 - t1);
     };
 
     useEffect(() => {
-        getLinks();
+        //getLinks();
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (

@@ -21,7 +21,6 @@ const LinkForm = (props) => {
     const handleInputChange = e => {
         const { name, value } = e.target
         setValues({ ...values, [name]: value })
-
     }
 
     const handleSubmit = e => {
@@ -30,8 +29,8 @@ const LinkForm = (props) => {
         setValues({ ...initialStateValues });
     }
 
-    const getLinkById = async (id) => {
-        const doc = await db.collection('employees').doc(id).get();
+    const getLinkById = (id) => {
+        const doc = db.collection('employees').doc(id).get();
         setValues({ ...doc.data() });
     }
 
