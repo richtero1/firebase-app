@@ -11,17 +11,16 @@ const Links = () => {
     const [employees, setLinks] = useState([]);
     const [currentId, setCurrentId] = useState('');
 
-
-    const addOrEditLink = (linkObject) => {
+    const addOrEditDoc = (docObject) => {
         let t1, t2 = 0;
         try {
             if (currentId === '') {
                 t1 = performance.now();
-                db.collection('employees').doc().set(linkObject);
+                db.collection('employees').doc().set(docObject);
                 t2 = performance.now();
             } else {
                 t1 = performance.now();
-                db.collection('employees').doc(currentId).update(linkObject);
+                db.collection('employees').doc(currentId).update(docObject);
                 t2 = performance.now();
                 setCurrentId('');
             }
@@ -29,11 +28,9 @@ const Links = () => {
             console.error(error);
         }
         setT(t2 - t1);
-        console.log(t2 - t1);
-
     }
 
-    const onDeleteLink = (id) => {
+    const onDeleteDoc = (id) => {
         let t1,t2 = 0;
         t1= performance.now();
         db.collection('employees').doc(id).delete();
@@ -41,22 +38,11 @@ const Links = () => {
         setT(t2 - t1);
     }
 
-    const getLinks = () => {
-        
-        db.collection('employees').onSnapshot((querySnapshot) => {
-            const docs = [];
-            querySnapshot.forEach(doc => {
-                docs.push({ ...doc.data(), id: doc.id });
-            });
-            setLinks(docs);
-        });
-        
-    };
-
     const query = () => {
         let t1,t2 = 0;
         t1 = performance.now();
-        db.collection('employees').where('city', '==', 'Miami').where('department', '==', 'Engineering').onSnapshot((querySnapshot) => {
+        db.collection('employees').where('city', '==', 'Miami').where('department', '==', 'Engineering')
+        .onSnapshot((querySnapshot) => {
             const docs = [];
             querySnapshot.forEach(doc => {
                 docs.push({ ...doc.data(), id: doc.id });
@@ -65,11 +51,22 @@ const Links = () => {
         });
         t2 = performance.now(); 
         setT(t2 - t1); 
-        console.log(t2 - t1);
     };
 
+    const getDocs = () => {
+        db.collection('employees').onSnapshot((querySnapshot) => {
+            const docs = [];
+            querySnapshot.forEach(doc => {
+                docs.push({ ...doc.data(), id: doc.id });
+            });
+            setLinks(docs);
+        });
+    };
+
+    
+
     useEffect(() => {
-        //getLinks();
+        getDocs();
     }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
@@ -91,13 +88,13 @@ const Links = () => {
                 </nav>
             </div>
             <div className="container p-3">
-                <LinkForm {...{ addOrEditLink, currentId, employees }} />
+                <LinkForm {...{ addOrEditDoc, currentId, employees }} />
             </div>
             <div className="container">
                 <div className="row" >
                     <div className="col-3"></div>
                     <div className="col-3 ">
-                        <button type="button" className="btn btn-success " onClick={getLinks}> Obtener Todo</button>
+                        <button type="button" className="btn btn-success " onClick={getDocs}> Obtener Todo</button>
                     </div>
                     <div className="col-1"></div>
                     <div className="col-3 text center">
@@ -127,21 +124,21 @@ const Links = () => {
                         </tr>
                     </thead>
                     <tbody>
-                        {employees.map(link => (
-                            <tr key={link.id}>
-                                <td>{link.first_name}</td>
-                                <td>{link.last_name}</td>
-                                <td>{link.email}</td>
-                                <td>{link.birthdate}</td>
-                                <td>{link.gender}</td>
-                                <td>{link.ssn}</td>
-                                <td>{link.phone_number}</td>
-                                <td>{link.department}</td>
-                                <td>{link.city}</td>
-                                <td>{link.state}</td>
+                        {employees.map(employees => (
+                            <tr key={employees.id}>
+                                <td>{employees.first_name}</td>
+                                <td>{employees.last_name}</td>
+                                <td>{employees.email}</td>
+                                <td>{employees.birthdate}</td>
+                                <td>{employees.gender}</td>
+                                <td>{employees.ssn}</td>
+                                <td>{employees.phone_number}</td>
+                                <td>{employees.department}</td>
+                                <td>{employees.city}</td>
+                                <td>{employees.state}</td>
                                 <td>
-                                    <i className="material-icons text-danger p-2" onClick={() => onDeleteLink(link.id)}>close</i>
-                                    <i className="material-icons p-2" onClick={() => setCurrentId(link.id)}>create</i>
+                                    <i className="material-icons text-danger p-2" onClick={() => onDeleteDoc(employees.id)}>close</i>
+                                    <i className="material-icons p-2" onClick={() => setCurrentId(employees.id)}>create</i>
                                 </td>
                             </tr>
                         ))}

@@ -25,12 +25,12 @@ const LinkForm = (props) => {
 
     const handleSubmit = e => {
         e.preventDefault();
-        props.addOrEditLink(values);
+        props.addOrEditDoc(values);
         setValues({ ...initialStateValues });
     }
 
-    const getLinkById = (id) => {
-        const doc = db.collection('employees').doc(id).get();
+    const getLinkById = async (id) => {
+        const doc = await db.collection('employees').doc(id).get();
         setValues({ ...doc.data() });
     }
 
@@ -68,7 +68,7 @@ const LinkForm = (props) => {
                         <div className="input-group-text bg-light">
                             <i className="material-icons">create</i>
                         </div>
-                        <input type="text" className="form-control" placeholder="Cumpleanos" name="birthdate" onChange={handleInputChange} value={values.birthdate} />
+                        <input type="text" className="form-control" placeholder="Cumpleaños" name="birthdate" onChange={handleInputChange} value={values.birthdate} />
                     </div>
                     <div className="form-group input-group">
                         <div className="input-group-text bg-light">
